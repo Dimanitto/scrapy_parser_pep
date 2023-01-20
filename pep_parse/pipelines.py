@@ -5,13 +5,13 @@ from pep_parse.settings import BASE_DIR, time
 class PepParsePipeline:
     def open_spider(self, spider):
         self.statuses_count = {}
+        self.total_count = 0
 
     def process_item(self, item, spider):
         status = item['status']
-        if self.statuses_count.get(status):
-            self.statuses_count[status] += 1
-        else:
-            self.statuses_count[status] = 1
+        value = self.statuses_count.get(status, 0) + 1
+        self.statuses_count[status] = value
+        self.total_count += 1
         return item
 
     def close_spider(self, spider):
@@ -21,7 +21,5 @@ class PepParsePipeline:
             fieldnames = ('Статус', 'Количество')
             writer = csv.writer(f)
             writer.writerow(fieldnames)
-            for key, value in self.statuses_count.items():
-                writer.writerow([key, value])
-            total_count = sum(self.statuses_count.values())
-            writer.writerow(['Total', total_count])
+            writer.writerows(self.statuses_count.items())
+            writer.writerow(['Total', self.total_count])

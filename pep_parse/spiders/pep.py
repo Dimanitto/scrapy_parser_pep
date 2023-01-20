@@ -26,8 +26,9 @@ class PepSpider(scrapy.Spider):
         status = response.xpath(
             '//dt[contains(., "Status")]/following::dd/abbr/text()'
         ).get()
+        number = int(re.findall(r'\d+', pep_title.number)[0])
         data = {
-            'number': int(re.findall(r'\d+', pep_title.number)[0]),
+            'number': number,
             'name': pep_title.name,
             'status': status,
         }
